@@ -1,6 +1,7 @@
 package com.ehmjamiu.learn.controller;
 
 import com.ehmjamiu.learn.entity.Task;
+import com.ehmjamiu.learn.entity.TaskStatus;
 import com.ehmjamiu.learn.exceptionHandler.ErrorResponse;
 import com.ehmjamiu.learn.exceptionHandler.TodoNotFoundException;
 import com.ehmjamiu.learn.service.TaskService;
@@ -46,6 +47,12 @@ public class TaskController {
         return task;
     }
 
+    @GetMapping("/todos/status")
+    public List<Task> getTasksByStatus(@RequestParam TaskStatus status) {
+        return taskService.getTasksByStatus(status);
+
+    }
+
     @PostMapping("/todos")
     public Task save(@RequestBody Task task) {
         return taskService.save(task);
@@ -79,6 +86,8 @@ public class TaskController {
 
         taskService.deleteById(id);
     }
+
+
 
     @ExceptionHandler
     public ResponseEntity<ErrorResponse> handleException(Exception e) {
