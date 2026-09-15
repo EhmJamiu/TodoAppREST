@@ -1,17 +1,23 @@
 package com.ehmjamiu.learn.controller;
 
-import jakarta.servlet.*;
-import jakarta.servlet.http.*;
-import jakarta.servlet.annotation.*;
-import java.io.IOException;
+import com.ehmjamiu.learn.entity.TodoUser;
+import com.ehmjamiu.learn.service.UserService;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
-@WebServlet(name = "UserController", value = "/UserController")
-public class UserController extends HttpServlet {
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-       
+@RestController
+public class UserController {
+
+    private final UserService userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
     }
 
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
+    @PostMapping("/register")
+    public TodoUser register(@RequestBody TodoUser user) {
+        return userService.register(user);
     }
 }

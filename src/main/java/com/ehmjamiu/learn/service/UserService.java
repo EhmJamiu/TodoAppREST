@@ -1,17 +1,27 @@
 package com.ehmjamiu.learn.service;
 
-import jakarta.servlet.*;
-import jakarta.servlet.http.*;
-import jakarta.servlet.annotation.*;
-import java.io.IOException;
+import com.ehmjamiu.learn.entity.TodoUser;
+import com.ehmjamiu.learn.repo.TodoUserRepository;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
 
-@WebServlet(name = "UserService", value = "/UserService")
-public class UserService extends HttpServlet {
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-       
+@Service
+public class UserService {
+
+    private final TodoUserRepository todoUserRepository;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    public UserService(TodoUserRepository todoUserRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
+        this.todoUserRepository = todoUserRepository;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
+
+    public TodoUser register(TodoUser user) {
+        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+        return todoUserRepository.save(user);
     }
+
+
 }

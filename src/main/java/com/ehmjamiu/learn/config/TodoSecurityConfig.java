@@ -14,6 +14,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsPasswordService;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.provisioning.UserDetailsManager;
@@ -30,12 +31,18 @@ public class TodoSecurityConfig {
     }
 
     @Bean
+    public BCryptPasswordEncoder bCryptPasswordEncoder(){
+        return new BCryptPasswordEncoder(12);
+    }
+
+    @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) {
         return http.csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests(customizer -> customizer.anyRequest().authenticated())
+                //.authorizeHttpRequests(customizer -> customizer.anyRequest().authenticated())
+                .authorizeHttpRequests(auth -> auth.requestMatchers("/register").permitAll().anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults())
-//                .formLogin(Customizer.withDefaults())
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .formLogin(Customizer.withDefaults())
+                //.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .build();
     }
 
@@ -61,7 +68,7 @@ public class TodoSecurityConfig {
     public AuthenticationProvider authenticationProvider(){
 
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userDetailsService);
-        provider.setPasswordEncoder(NoOpPasswordEncoder.getInstance());
+        provider.setPasswordEncoder(bCryptPasswordEncoder());
         return provider;
         }
     }
