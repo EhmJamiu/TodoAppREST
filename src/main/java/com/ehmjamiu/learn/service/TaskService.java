@@ -1,23 +1,28 @@
 package com.ehmjamiu.learn.service;
 
-import ch.qos.logback.core.testUtil.RunnableWithCounterAndDone;
+import com.ehmjamiu.learn.dto.TaskDTO;
+import com.ehmjamiu.learn.dto.TaskResponseDTO;
 import com.ehmjamiu.learn.entity.Task;
 import com.ehmjamiu.learn.entity.TaskStatus;
+import com.ehmjamiu.learn.mapper.TaskMapper;
 import com.ehmjamiu.learn.repo.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
-import java.util.Optional;
+
 
 @Service
 public class TaskService {
 
     private final TaskRepository taskRepository;
+    private final TaskMapper taskMapper;
 
     @Autowired
-    public TaskService(TaskRepository taskRepository) {
+    public TaskService(TaskRepository taskRepository, TaskMapper taskMapper) {
         this.taskRepository = taskRepository;
+        this.taskMapper = taskMapper;
     }
 
     public List<Task> findAll(){
@@ -29,7 +34,13 @@ public class TaskService {
         return taskRepository.findById(id).orElse(null);
     }
 
-    public Task save(Task task) {
+    public TaskResponseDTO save(@RequestBody TaskDTO dto) {
+        Task task = taskMapper.toTask(dto);
+        Task savedTask = taskRepository.save(task);
+        return taskMapper.taskResponseDTO(savedTask);
+    }
+
+    public Task savePatch(Task task) {
         return taskRepository.save(task);
     }
 
@@ -44,4 +55,6 @@ public class TaskService {
 //        }
         return taskRepository.getTasksByStatus(status);
     }
+
+
 }

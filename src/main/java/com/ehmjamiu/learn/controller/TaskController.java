@@ -1,9 +1,13 @@
 package com.ehmjamiu.learn.controller;
 
+import com.ehmjamiu.learn.dto.TaskDTO;
+import com.ehmjamiu.learn.dto.TaskResponseDTO;
 import com.ehmjamiu.learn.entity.Task;
 import com.ehmjamiu.learn.entity.TaskStatus;
 import com.ehmjamiu.learn.exceptionHandler.ErrorResponse;
 import com.ehmjamiu.learn.exceptionHandler.TodoNotFoundException;
+import com.ehmjamiu.learn.mapper.TaskMapper;
+import com.ehmjamiu.learn.repo.TaskRepository;
 import com.ehmjamiu.learn.service.TaskService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,13 +28,17 @@ import java.util.Map;
 public class TaskController {
 
     private final JsonMapper jsonMapper;
+    private final TaskMapper taskMapper;
 
     private final TaskService taskService;
+    private final TaskRepository taskRepository;
 
     @Autowired
-    private TaskController(JsonMapper jsonMapper, TaskService categoryService) {
+    private TaskController(JsonMapper jsonMapper, TaskMapper taskMapper, TaskService categoryService, TaskRepository taskRepository) {
         this.jsonMapper = jsonMapper;
+        this.taskMapper = taskMapper;
         this.taskService = categoryService;
+        this.taskRepository = taskRepository;
     }
 
     @GetMapping("/todos")
@@ -56,8 +64,8 @@ public class TaskController {
     }
 
     @PostMapping("/todos")
-    public Task save(@RequestBody Task task) {
-        return taskService.save(task);
+    public TaskResponseDTO save(@RequestBody TaskDTO dto) {
+        return taskService.save(dto);
     }
 
 
@@ -77,7 +85,7 @@ public class TaskController {
         }
 
         Task patchedTask = jsonMapper.updateValue(existingTask , patchPayload);
-        return taskService.save(patchedTask);
+        return taskService.savePatch(patchedTask);
     }
 
     @DeleteMapping("/todos/{id}")
