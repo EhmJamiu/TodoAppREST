@@ -9,9 +9,11 @@ import com.ehmjamiu.learn.service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import tools.jackson.databind.json.JsonMapper;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -66,6 +68,8 @@ public class TaskController {
 
         if (existingTask == null) {
             throw new TodoNotFoundException("Task with id: " +id+ " does not exist");
+        } else {
+            existingTask.setUpdatedAt(LocalDateTime.now());
         }
 
         if (patchPayload.containsKey("id")) {
