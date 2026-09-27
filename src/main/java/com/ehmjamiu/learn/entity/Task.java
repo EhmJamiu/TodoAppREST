@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 
 @Entity
@@ -16,36 +17,38 @@ public class Task {
 
     private String title;
 
+    private String description;
+
     @Column(updatable = false)
     @JsonFormat(shape =JsonFormat.Shape.STRING, timezone = "UTC+1", pattern = "dd-mm-yy hh:mm a")
-    private LocalDateTime createdAt;
+    private LocalTime createdAt;
 
 
     @Column(updatable = true)
     @JsonFormat(shape =JsonFormat.Shape.STRING, timezone = "UTC+1", pattern = "dd-mm-yy hh:mm a")
-    private LocalDateTime updatedAt;
+    private LocalTime updatedAt;
 
     @Enumerated(EnumType.STRING)
     private TaskStatus status;
 
     public Task() {
         this.status = TaskStatus.PENDING;
-        this.createdAt = LocalDateTime.now();
+        this.createdAt = LocalTime.now();
     }
 
-    public LocalDateTime getCreatedAt() {
+    public LocalTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void setCreatedAt(LocalTime createdAt) {
         this.createdAt = createdAt;
     }
 
-    public LocalDateTime getUpdatedAt() {
+    public LocalTime getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(LocalDateTime updatedAt) {
+    public void setUpdatedAt(LocalTime updatedAt) {
         this.updatedAt = updatedAt;
     }
 
@@ -71,5 +74,13 @@ public class Task {
 
     public void setStatus(TaskStatus status) {
         this.status = status;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

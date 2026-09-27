@@ -5,7 +5,8 @@ import com.ehmjamiu.learn.entity.TaskStatus;
 import java.time.LocalDateTime;
 
 public record TaskDTO(
-        String title
+        String title,
+        String description
 ) {
 
 }

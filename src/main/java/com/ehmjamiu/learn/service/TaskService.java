@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import tools.jackson.databind.json.JsonMapper;
 
-import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -64,6 +64,10 @@ public class TaskService {
         return taskMapper.toTaskResponseDTO(savedTask);
     }
 
+    public void saveChange(@RequestBody Task task) {
+        taskRepository.save(task);
+    }
+
     public void deleteById(@PathVariable long id) {
         var task = findById(id);
         if(task == null) {
@@ -87,7 +91,7 @@ public class TaskService {
         if (existingTask == null) {
             throw new TodoNotFoundException("Task with id: " +id+ " does not exist");
         } else {
-            existingTask.setUpdatedAt(LocalDateTime.now());
+            existingTask.setUpdatedAt(LocalTime.now());
         }
 
         if (patchPayload.containsKey("id")) {
@@ -96,5 +100,9 @@ public class TaskService {
 
         Task patchedTask = jsonMapper.updateValue(existingTask , patchPayload);
         return savePatch(patchedTask);
+    }
+
+    public List<TaskResponseDTO> findAllByCreatedAtAsc() {
+        return taskRepository.findAllByCreatedAtAsc();
     }
 }

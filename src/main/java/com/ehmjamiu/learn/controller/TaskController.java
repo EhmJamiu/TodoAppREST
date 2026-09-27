@@ -4,20 +4,18 @@ import com.ehmjamiu.learn.dto.TaskDTO;
 import com.ehmjamiu.learn.dto.TaskResponseDTO;
 import com.ehmjamiu.learn.entity.Task;
 import com.ehmjamiu.learn.entity.TaskStatus;
-import com.ehmjamiu.learn.exceptionHandler.ErrorResponse;
 import com.ehmjamiu.learn.service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import tools.jackson.databind.json.JsonMapper;
+
+import java.time.LocalTime;
 import java.util.List;
-import java.util.Map;
 
 
-
-@RestController
-@RequestMapping("/api")
+@Controller
 public class TaskController {
 
      private final TaskService taskService;
@@ -29,49 +27,62 @@ public class TaskController {
 
     }
 
-    @GetMapping("/todos")
-    public List<TaskResponseDTO> findAll() {
-        return taskService.findAll();
-    }
+    @GetMapping("/todos/list")
+    public String getAllTasks(Model model) {
+        List<TaskResponseDTO> tasks = taskService.findAllByCreatedAtAsc();
 
-    @GetMapping("/todos/{id}")
-    public TaskResponseDTO findById(@PathVariable long id){
-        return taskService.findById(id);
-    }
+        model.addAttribute("tasks", tasks);
 
-    @GetMapping("/todos/status")
-    public List<Task> getTasksByStatus(@RequestParam TaskStatus status) {
-        return taskService.getTasksByStatus(status);
+        return "todo-list";
 
     }
 
-    @PostMapping("/todos")
-    public TaskResponseDTO save(@RequestBody TaskDTO dto) {
-        return taskService.save(dto);
+    @GetMapping("/todos/addTask")
+    public String addTask(Model model) {
+        Task task = new Task();
+
+        model.addAttribute("task", task);
+        return "todo-form";
+
     }
 
+    @PostMapping("/todos/saveTask")
+    public String saveTask(@ModelAttribute TaskDTO task) {
+        taskService.save(task);
 
-    @PatchMapping("/todos/{id}")
-    public Task patchTask (@PathVariable long id, @RequestBody Map<String, Object> patchPayload) {
-        return taskService.patchTask(id, patchPayload);
+        return "redirect:/todos/list";
     }
 
-    @DeleteMapping("/todos/{id}")
-    public void deleteById(@PathVariable long id) {
+    @GetMapping("/todos/changeStatus")
+    public String changeTaskStatus(@RequestParam("id") long id, Model model){
+        Task task = taskService.findTaskById(id);
+
+        if(task.getStatus().equals(TaskStatus.PENDING)){
+           task.setStatus(TaskStatus.IN_PROGRESS);
+           task.setUpdatedAt(LocalTime.now());
+
+        } else if (task.getStatus().equals(TaskStatus.IN_PROGRESS)){
+            task.setStatus(TaskStatus.COMPLETED);
+            task.setUpdatedAt(LocalTime.now());
+        } else {
+            task.setStatus(TaskStatus.PENDING);
+        }
+        taskService.saveChange(task);
+        model.addAttribute("task", task);
+
+
+        return "redirect:/todos/list";
+
+    }
+
+    @GetMapping("/todos/delete")
+    public String deleteTask(@RequestParam("id") long id, Model model){
+
         taskService.deleteById(id);
+
+        return "redirect:/todos/list";
     }
 
-    @ExceptionHandler
-    public ResponseEntity<ErrorResponse> handleException(Exception e) {
-        ErrorResponse error = new ErrorResponse();
-
-        error.setStatus(HttpStatus.BAD_REQUEST.value());
-        error.setMessage(e.getMessage());
-        error.setTimeStamp(System.currentTimeMillis());
-
-        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
-
-    }
 
 
 }
