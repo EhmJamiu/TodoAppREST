@@ -75,8 +75,26 @@ public class TaskController {
 
     }
 
+    @GetMapping("/todos/editTask")
+    public String showFormForUpdate(@RequestParam("id") long id, Model model) {
+        Task task = taskService.findTaskById(id);
+
+        model.addAttribute("task", task);
+
+        return "edit-task-form";
+    }
+
+    @PostMapping("todos/saveEdit")
+    public String saveEditTask(@ModelAttribute("id") Task task){
+        task.setUpdatedAt(LocalTime.now());
+        taskService.saveChange(task);
+
+        return "redirect:/todos/list";
+    }
+
+
     @GetMapping("/todos/delete")
-    public String deleteTask(@RequestParam("id") long id, Model model){
+    public String deleteTask(@RequestParam("id") long id){
 
         taskService.deleteById(id);
 
