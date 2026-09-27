@@ -14,7 +14,7 @@ public class TaskMapper {
         return task;
     }
 
-    public TaskResponseDTO taskResponseDTO(Task task) {
+    public TaskResponseDTO toTaskResponseDTO(Task task) {
         return new TaskResponseDTO(
                 task.getTitle(),
                 task.getCreatedAt(),

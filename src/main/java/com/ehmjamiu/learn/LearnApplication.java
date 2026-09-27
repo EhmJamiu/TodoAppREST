@@ -1,7 +1,5 @@
 package com.ehmjamiu.learn;
 
-import com.ehmjamiu.learn.entity.Task;
-import jakarta.persistence.EntityManager;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 

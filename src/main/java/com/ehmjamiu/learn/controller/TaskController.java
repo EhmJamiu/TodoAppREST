@@ -5,19 +5,12 @@ import com.ehmjamiu.learn.dto.TaskResponseDTO;
 import com.ehmjamiu.learn.entity.Task;
 import com.ehmjamiu.learn.entity.TaskStatus;
 import com.ehmjamiu.learn.exceptionHandler.ErrorResponse;
-import com.ehmjamiu.learn.exceptionHandler.TodoNotFoundException;
-import com.ehmjamiu.learn.mapper.TaskMapper;
-import com.ehmjamiu.learn.repo.TaskRepository;
 import com.ehmjamiu.learn.service.TaskService;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import tools.jackson.databind.json.JsonMapper;
-
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -27,34 +20,23 @@ import java.util.Map;
 @RequestMapping("/api")
 public class TaskController {
 
-    private final JsonMapper jsonMapper;
-    private final TaskMapper taskMapper;
+     private final TaskService taskService;
 
-    private final TaskService taskService;
-    private final TaskRepository taskRepository;
 
     @Autowired
-    private TaskController(JsonMapper jsonMapper, TaskMapper taskMapper, TaskService categoryService, TaskRepository taskRepository) {
-        this.jsonMapper = jsonMapper;
-        this.taskMapper = taskMapper;
+    private TaskController(JsonMapper jsonMapper,  TaskService categoryService) {
         this.taskService = categoryService;
-        this.taskRepository = taskRepository;
+
     }
 
     @GetMapping("/todos")
-    public List<Task> findAll() {
+    public List<TaskResponseDTO> findAll() {
         return taskService.findAll();
     }
 
     @GetMapping("/todos/{id}")
-    public Task findById(@PathVariable long id){
-        Task task = taskService.findById(id);
-
-        if (task == null) {
-            throw new TodoNotFoundException("Task with id: " +id+ " does not exist");
-
-        }
-        return task;
+    public TaskResponseDTO findById(@PathVariable long id){
+        return taskService.findById(id);
     }
 
     @GetMapping("/todos/status")
@@ -70,36 +52,14 @@ public class TaskController {
 
 
     @PatchMapping("/todos/{id}")
-    public Task patchTask (@PathVariable long id, @RequestBody Map<String, Object> patchPayload
-                           ) {
-        Task existingTask = taskService.findById(id);
-
-        if (existingTask == null) {
-            throw new TodoNotFoundException("Task with id: " +id+ " does not exist");
-        } else {
-            existingTask.setUpdatedAt(LocalDateTime.now());
-        }
-
-        if (patchPayload.containsKey("id")) {
-            throw new RuntimeException("Task id not allow in the request body - " + id);
-        }
-
-        Task patchedTask = jsonMapper.updateValue(existingTask , patchPayload);
-        return taskService.savePatch(patchedTask);
+    public Task patchTask (@PathVariable long id, @RequestBody Map<String, Object> patchPayload) {
+        return taskService.patchTask(id, patchPayload);
     }
 
     @DeleteMapping("/todos/{id}")
     public void deleteById(@PathVariable long id) {
-
-        Task task = taskService.findById(id);
-        if(task == null) {
-            throw new TodoNotFoundException("Task with id: " +id+ " does not exist");
-        }
-
         taskService.deleteById(id);
     }
-
-
 
     @ExceptionHandler
     public ResponseEntity<ErrorResponse> handleException(Exception e) {

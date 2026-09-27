@@ -5,7 +5,6 @@ import com.ehmjamiu.learn.entity.TodoUser;
 import com.ehmjamiu.learn.model.TodoUserPrincipal;
 import com.ehmjamiu.learn.repo.TodoUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -14,7 +13,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class TodoUserDetailsService implements UserDetailsService {
 
-    private TodoUserRepository todoUserRepository;
+    private final TodoUserRepository todoUserRepository;
 
     @Autowired
     public TodoUserDetailsService(TodoUserRepository todoUserRepository) {
