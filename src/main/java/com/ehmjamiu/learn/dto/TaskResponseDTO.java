@@ -1,6 +1,6 @@
 package com.ehmjamiu.learn.dto;
 
-import com.ehmjamiu.learn.entity.TaskStatus;
+import com.ehmjamiu.learn.entity.enums.TaskStatus;
 
 import java.time.LocalDateTime;
 
