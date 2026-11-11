@@ -27,7 +27,7 @@ public interface TaskService {
 
     Task patchTask (long id, Map<String, Object> patchPayload, String username);
 
-    List<Task> getTasksByStatus(TaskStatus status);
+    List<Task> getTasksByStatus(TaskStatus status, String username);
 
     void updateTask(long id, TaskDTO request, String username);
 }

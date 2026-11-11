@@ -3,6 +3,7 @@ package com.ehmjamiu.learn.controller;
 import com.ehmjamiu.learn.dto.TaskDTO;
 import com.ehmjamiu.learn.dto.TaskResponseDTO;
 import com.ehmjamiu.learn.entity.Task;
+import com.ehmjamiu.learn.entity.TodoUser;
 import com.ehmjamiu.learn.entity.enums.TaskStatus;
 import com.ehmjamiu.learn.service.JwtService;
 import com.ehmjamiu.learn.service.TaskService;
@@ -49,8 +50,11 @@ public class TaskController {
     }
 
     @GetMapping("/todos/status")
-    public List<Task> getTasksByStatus(@RequestParam TaskStatus status) {
-        return taskService.getTasksByStatus(status);
+    public List<Task> getTasksByStatus(@RequestParam TaskStatus status, @RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.substring(7);
+        String username = jwtService.extractUsername(token);
+
+        return taskService.getTasksByStatus(status, username);
 
     }
 
@@ -82,8 +86,8 @@ public class TaskController {
     @DeleteMapping("/todos/{id}")
     public ResponseEntity<?> deleteById(@PathVariable long id, @RequestHeader("Authorization") String authHeader) {
         String token = authHeader.substring(7);
-        String email = jwtService.extractUsername(token);
-        taskService.deleteById(id, email);
+        String username = jwtService.extractUsername(token);
+        taskService.deleteById(id, username);
         return ResponseHandler.handleResponse("", HttpStatus.OK, "A task deleted");
     }
 

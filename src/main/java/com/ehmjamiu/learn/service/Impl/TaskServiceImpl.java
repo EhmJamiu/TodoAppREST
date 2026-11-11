@@ -5,10 +5,7 @@ import com.ehmjamiu.learn.dto.TaskResponseDTO;
 import com.ehmjamiu.learn.entity.Task;
 import com.ehmjamiu.learn.entity.TodoUser;
 import com.ehmjamiu.learn.entity.enums.TaskStatus;
-import com.ehmjamiu.learn.exceptionHandler.CustomBadRequest;
-import com.ehmjamiu.learn.exceptionHandler.TodoNotFoundException;
-import com.ehmjamiu.learn.exceptionHandler.UserDoesNotExist;
-import com.ehmjamiu.learn.exceptionHandler.UserNotFound;
+import com.ehmjamiu.learn.exceptionHandler.*;
 import com.ehmjamiu.learn.mapper.TaskMapper;
 import com.ehmjamiu.learn.repo.TaskRepository;
 import com.ehmjamiu.learn.repo.TodoUserRepository;
@@ -90,7 +87,7 @@ public class TaskServiceImpl implements TaskService{
         if(task == null) {
             throw new TodoNotFoundException("Task with id: " +id+ " does not exist");
         }
-        taskRepository.deleteById(id);
+        taskRepository.deleteByIdAndUser(id, user);
     }
 
 
@@ -98,15 +95,23 @@ public class TaskServiceImpl implements TaskService{
         return taskRepository.save(patchedTask);
     }
 
-    public List<Task> getTasksByStatus(TaskStatus status) {
-        return taskRepository.getTasksByStatus(status);
+    @Override
+    public List<Task> getTasksByStatus(TaskStatus status, String username) {
+        TodoUser user = todoUserRepository.findUserByUsername(username);
+        if(user == null) throw new CustomNotFound("User details is not complete");
+        return taskRepository.getTasksByStatusAndUser(status, user);
     }
 
     @Override
     public void updateTask(long id, @Valid TaskDTO request, String username) {
+        TodoUser user = todoUserRepository.findUserByUsername(username);
         if(request.title() == null || request.title().isEmpty()) throw new CustomBadRequest("Task tile is required");
-        Task existingTask = taskRepository.findById(id).orElseThrow(()
-                -> new TodoNotFoundException());
+        Task existingTask = taskRepository.findByIdAndUser(id, user).orElseThrow(()
+                -> new TodoNotFoundException("Task not found"));
+
+        existingTask.setTitle(request.title());
+        existingTask.setUpdatedAt(LocalDateTime.now());
+
         taskRepository.save(existingTask);
     }
 
@@ -128,4 +133,6 @@ public class TaskServiceImpl implements TaskService{
         Task patchedTask = jsonMapper.updateValue(existingTask , patchPayload);
         return savePatch(patchedTask);
     }
+
+
 }
