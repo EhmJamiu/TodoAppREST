@@ -1,0 +1,16 @@
+package com.ehmjamiu.learn.repo;
+
+import com.ehmjamiu.learn.entity.ResetToken;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
+import java.util.UUID;
+
+@Repository
+public interface ResetTokenRepository extends JpaRepository<ResetToken, Long> {
+
+    Optional<ResetToken> findByUserUsername(String userUsername);
+
+    Optional<ResetToken> findByToken(UUID token);
+}

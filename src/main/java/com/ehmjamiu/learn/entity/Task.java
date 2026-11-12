@@ -1,13 +1,16 @@
 package com.ehmjamiu.learn.entity;
 
+import com.ehmjamiu.learn.entity.enums.TaskStatus;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
+import lombok.Data;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 
 @Entity
+@Data
 @Table(name = "todos")
 public class Task {
 
@@ -17,14 +20,16 @@ public class Task {
 
     private String title;
 
-    private String description;
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private TodoUser user;
 
     @Column(updatable = false)
     @JsonFormat(shape =JsonFormat.Shape.STRING, timezone = "UTC+1", pattern = "dd-mm-yy hh:mm a")
     private LocalTime createdAt;
 
 
-    @Column(updatable = true)
+    @Column
     @JsonFormat(shape =JsonFormat.Shape.STRING, timezone = "UTC+1", pattern = "dd-mm-yy hh:mm a")
     private LocalTime updatedAt;
 
@@ -36,51 +41,5 @@ public class Task {
         this.createdAt = LocalTime.now();
     }
 
-    public LocalTime getCreatedAt() {
-        return createdAt;
-    }
 
-    public void setCreatedAt(LocalTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public TaskStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(TaskStatus status) {
-        this.status = status;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
 }

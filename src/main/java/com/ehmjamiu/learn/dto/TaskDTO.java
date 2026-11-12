@@ -1,12 +1,10 @@
 package com.ehmjamiu.learn.dto;
 
-import com.ehmjamiu.learn.entity.TaskStatus;
-
-import java.time.LocalDateTime;
+import jakarta.validation.constraints.NotNull;
 
 public record TaskDTO(
-        String title,
-        String description
+        @NotNull
+        String title
 ) {
 
 }

@@ -2,16 +2,17 @@ package com.ehmjamiu.learn.controller;
 
 import com.ehmjamiu.learn.dto.TaskDTO;
 import com.ehmjamiu.learn.dto.TaskResponseDTO;
+import com.ehmjamiu.learn.dto.TaskStatusRequest;
 import com.ehmjamiu.learn.entity.Task;
-import com.ehmjamiu.learn.entity.TaskStatus;
+import com.ehmjamiu.learn.entity.TodoUser;
+import com.ehmjamiu.learn.entity.enums.TaskStatus;
+import com.ehmjamiu.learn.service.JwtService;
 import com.ehmjamiu.learn.service.TaskService;
+import com.ehmjamiu.learn.util.ResponseHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import tools.jackson.databind.json.JsonMapper;
-
-import java.time.LocalTime;
 import java.util.List;
 
 
@@ -19,87 +20,83 @@ import java.util.List;
 public class TaskController {
 
      private final TaskService taskService;
+     private final JwtService jwtService;
 
 
-    @Autowired
-    private TaskController(JsonMapper jsonMapper,  TaskService categoryService) {
-        this.taskService = categoryService;
-
-    }
-
-    @GetMapping("/todos/list")
-    public String getAllTasks(Model model) {
-        List<TaskResponseDTO> tasks = taskService.findAllByCreatedAtAsc();
-
-        model.addAttribute("tasks", tasks);
-
-        return "todo-list";
+     TaskController(TaskService taskService, JwtService jwtService) {
+        this.taskService = taskService;
+        this.jwtService = jwtService;
 
     }
 
-    @GetMapping("/todos/addTask")
-    public String addTask(Model model) {
-        Task task = new Task();
+    @GetMapping("/todos")
+    public ResponseEntity<?> findAll(@RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.substring(7);
+        String username = jwtService.extractUsername(token);
 
-        model.addAttribute("task", task);
-        return "todo-form";
+        List<TaskResponseDTO> response = taskService.findAllTaskByUsername(username);
+        return ResponseHandler.handleResponse(response, HttpStatus.OK, "tasks retrieved");
+    }
+
+    @GetMapping("/todos/{id}")
+    public ResponseEntity<?> findById(@PathVariable long id, @RequestHeader("Authorization") String authHeader){
+        String token = authHeader.substring(7);
+        String username = jwtService.extractUsername(token);
+
+         TaskResponseDTO response = taskService.findById(id, username);
+         return ResponseHandler.handleResponse(response, HttpStatus.OK, "A task retrieved");
+    }
+
+    @GetMapping("/todos/status")
+    public List<Task> getTasksByStatus(@RequestParam TaskStatus status, @RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.substring(7);
+        String username = jwtService.extractUsername(token);
+
+        return taskService.getTasksByStatus(status, username);
 
     }
 
-    @PostMapping("/todos/saveTask")
-    public String saveTask(@ModelAttribute TaskDTO task) {
-        taskService.save(task);
-
-        return "redirect:/todos/list";
-    }
-
-    @GetMapping("/todos/changeStatus")
-    public String changeTaskStatus(@RequestParam("id") long id, Model model){
-        Task task = taskService.findTaskById(id);
-
-        if(task.getStatus().equals(TaskStatus.PENDING)){
-           task.setStatus(TaskStatus.IN_PROGRESS);
-           task.setUpdatedAt(LocalTime.now());
-
-        } else if (task.getStatus().equals(TaskStatus.IN_PROGRESS)){
-            task.setStatus(TaskStatus.COMPLETED);
-            task.setUpdatedAt(LocalTime.now());
-        } else {
-            task.setStatus(TaskStatus.PENDING);
-        }
-        taskService.saveChange(task);
-        model.addAttribute("task", task);
-
-
-        return "redirect:/todos/list";
-
-    }
-
-    @GetMapping("/todos/editTask")
-    public String showFormForUpdate(@RequestParam("id") long id, Model model) {
-        Task task = taskService.findTaskById(id);
-
-        model.addAttribute("task", task);
-
-        return "edit-task-form";
-    }
-
-    @PostMapping("todos/saveEdit")
-    public String saveEditTask(@ModelAttribute("id") Task task){
-        task.setUpdatedAt(LocalTime.now());
-        taskService.saveChange(task);
-
-        return "redirect:/todos/list";
+    @PostMapping("/todos")
+    public ResponseEntity<?> save(@RequestBody TaskDTO dto, @RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.substring(7);
+        String username = jwtService.extractUsername(token);
+        taskService.save(dto, username);
+        return ResponseHandler.handleResponse(null, HttpStatus.CREATED, "A task created");
     }
 
 
-    @GetMapping("/todos/delete")
-    public String deleteTask(@RequestParam("id") long id){
+//    @PatchMapping("/todos/{id}")
+//    public ResponseEntity<?> patchTask (@PathVariable long id, @RequestHeader("Authorization") String authHeader, @RequestBody Map<String, Object> patchPayload) {
+//        String token = authHeader.substring(7);
+//        String username = jwtService.extractUsername(token);
+//        Task response = taskService.patchTask(id, patchPayload, username);
+//        return ResponseHandler.handleResponse(response, HttpStatus.OK, "Task updated");
+//    }
 
-        taskService.deleteById(id);
-
-        return "redirect:/todos/list";
+    @PutMapping("/todos/{id}")
+    public ResponseEntity<?> updateTask (@PathVariable long id, @RequestHeader("Authorization") String authHeader, @RequestBody TaskDTO request) {
+        String token = authHeader.substring(7);
+        String username = jwtService.extractUsername(token);
+        taskService.updateTask(id, request, username);
+        return ResponseHandler.handleResponse(null, HttpStatus.OK, "Task updated");
     }
+
+    @DeleteMapping("/todos/{id}")
+    public ResponseEntity<?> deleteById(@PathVariable long id, @RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.substring(7);
+        String username = jwtService.extractUsername(token);
+        taskService.deleteById(id, username);
+        return ResponseHandler.handleResponse("", HttpStatus.OK, "A task deleted");
+    }
+
+    @PutMapping("/todos/update-status/{id}")
+    public ResponseEntity<?> updateTaskStatus (@PathVariable long id, @RequestHeader("Authorization") String authHeader, @RequestBody TaskStatusRequest request) {
+        String token = authHeader.substring(7);
+        String username = jwtService.extractUsername(token);
+        taskService.updateTaskStatus(id, request, username);
+        return ResponseHandler.handleResponse(null, HttpStatus.OK, "Task updated");
+    }
+
 
 
 
