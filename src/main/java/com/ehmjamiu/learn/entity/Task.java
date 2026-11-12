@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
@@ -26,19 +27,19 @@ public class Task {
 
     @Column(updatable = false)
     @JsonFormat(shape =JsonFormat.Shape.STRING, timezone = "UTC+1", pattern = "dd-mm-yy hh:mm a")
-    private LocalTime createdAt;
+    private LocalDateTime createdAt;
 
 
     @Column
     @JsonFormat(shape =JsonFormat.Shape.STRING, timezone = "UTC+1", pattern = "dd-mm-yy hh:mm a")
-    private LocalTime updatedAt;
+    private LocalDateTime updatedAt;
 
     @Enumerated(EnumType.STRING)
     private TaskStatus status;
 
     public Task() {
         this.status = TaskStatus.PENDING;
-        this.createdAt = LocalTime.now();
+        this.createdAt = LocalDateTime.now();
     }
 
 

@@ -11,7 +11,6 @@ public class TaskMapper {
     public Task toTask(TaskDTO dto) {
         Task task = new Task();
         task.setTitle(dto.title());
-        task.setDescription(dto.description());
         return task;
     }
 
@@ -19,7 +18,6 @@ public class TaskMapper {
         return new TaskResponseDTO(
                 task.getId(),
                 task.getTitle(),
-                task.getDescription(),
                 task.getCreatedAt(),
                 task.getUpdatedAt(),
                 task.getStatus()

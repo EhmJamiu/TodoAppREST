@@ -8,9 +8,9 @@ import java.time.LocalTime;
 public record TaskResponseDTO(
         long id,
         String title,
-        String description,
-        LocalTime createdAt,
-        LocalTime updatedAt,
+        //String description,
+        LocalDateTime createdAt,
+        LocalDateTime updatedAt,
         TaskStatus status
 ) {
 }
