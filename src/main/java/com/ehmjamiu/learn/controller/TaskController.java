@@ -2,6 +2,7 @@ package com.ehmjamiu.learn.controller;
 
 import com.ehmjamiu.learn.dto.TaskDTO;
 import com.ehmjamiu.learn.dto.TaskResponseDTO;
+import com.ehmjamiu.learn.dto.TaskStatusRequest;
 import com.ehmjamiu.learn.entity.Task;
 import com.ehmjamiu.learn.entity.TodoUser;
 import com.ehmjamiu.learn.entity.enums.TaskStatus;
@@ -89,6 +90,14 @@ public class TaskController {
         String username = jwtService.extractUsername(token);
         taskService.deleteById(id, username);
         return ResponseHandler.handleResponse("", HttpStatus.OK, "A task deleted");
+    }
+
+    @PutMapping("/todos/update-status/{id}")
+    public ResponseEntity<?> updateTaskStatus (@PathVariable long id, @RequestHeader("Authorization") String authHeader, @RequestBody TaskStatusRequest request) {
+        String token = authHeader.substring(7);
+        String username = jwtService.extractUsername(token);
+        taskService.updateTaskStatus(id, request, username);
+        return ResponseHandler.handleResponse(null, HttpStatus.OK, "Task updated");
     }
 
 

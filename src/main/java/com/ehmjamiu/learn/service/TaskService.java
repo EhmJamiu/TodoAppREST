@@ -3,6 +3,7 @@ package com.ehmjamiu.learn.service;
 
 import com.ehmjamiu.learn.dto.TaskDTO;
 import com.ehmjamiu.learn.dto.TaskResponseDTO;
+import com.ehmjamiu.learn.dto.TaskStatusRequest;
 import com.ehmjamiu.learn.entity.Task;
 import com.ehmjamiu.learn.entity.enums.TaskStatus;
 import org.springframework.stereotype.Service;
@@ -30,4 +31,6 @@ public interface TaskService {
     List<Task> getTasksByStatus(TaskStatus status, String username);
 
     void updateTask(long id, TaskDTO request, String username);
+
+    void updateTaskStatus(long id, TaskStatusRequest request, String username);
 }

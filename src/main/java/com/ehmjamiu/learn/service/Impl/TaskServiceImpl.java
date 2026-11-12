@@ -2,6 +2,7 @@ package com.ehmjamiu.learn.service.Impl;
 
 import com.ehmjamiu.learn.dto.TaskDTO;
 import com.ehmjamiu.learn.dto.TaskResponseDTO;
+import com.ehmjamiu.learn.dto.TaskStatusRequest;
 import com.ehmjamiu.learn.entity.Task;
 import com.ehmjamiu.learn.entity.TodoUser;
 import com.ehmjamiu.learn.entity.enums.TaskStatus;
@@ -105,11 +106,24 @@ public class TaskServiceImpl implements TaskService{
     @Override
     public void updateTask(long id, @Valid TaskDTO request, String username) {
         TodoUser user = todoUserRepository.findUserByUsername(username);
-        if(request.title() == null || request.title().isEmpty()) throw new CustomBadRequest("Task tile is required");
+        if(request.title() == null || request.title().isEmpty()) throw new CustomBadRequest("Task title is required");
         Task existingTask = taskRepository.findByIdAndUser(id, user).orElseThrow(()
                 -> new TodoNotFoundException("Task not found"));
 
         existingTask.setTitle(request.title());
+        existingTask.setUpdatedAt(LocalDateTime.now());
+
+        taskRepository.save(existingTask);
+    }
+
+    @Override
+    public void updateTaskStatus(long id, TaskStatusRequest request, String username) {
+        TodoUser user = todoUserRepository.findUserByUsername(username);
+        if(request.status() == null) throw new CustomBadRequest("Task status update is required");
+        Task existingTask = taskRepository.findByIdAndUser(id, user).orElseThrow(()
+                -> new TodoNotFoundException("Task not found"));
+
+        existingTask.setStatus(request.status());
         existingTask.setUpdatedAt(LocalDateTime.now());
 
         taskRepository.save(existingTask);
