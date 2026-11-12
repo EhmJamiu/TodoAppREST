@@ -10,11 +10,13 @@ import com.ehmjamiu.learn.repo.TodoUserRepository;
 import com.ehmjamiu.learn.service.ResetTokenService;
 import com.ehmjamiu.learn.util.CalculateExpiresTime;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
+@Service
 public class ResetTokenServiceImpl implements ResetTokenService {
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
     private final TodoUserRepository todoUserRepository;
