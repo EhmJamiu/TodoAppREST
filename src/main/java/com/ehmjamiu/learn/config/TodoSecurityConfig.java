@@ -43,7 +43,7 @@ public class TodoSecurityConfig {
         return http.csrf(csrf -> csrf.disable())
                 //.authorizeHttpRequests(customizer -> customizer.anyRequest().authenticated())
                 .authorizeHttpRequests(auth ->
-                        auth.requestMatchers("/register", "/login", "/error", "/hello", "/").permitAll().anyRequest().authenticated())
+                        auth.requestMatchers("/register", "/login", "/error", "/hello", "/", "/css/**", "/images/**", "/js/**").permitAll().anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults())
                 //.formLogin(Customizer.withDefaults())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
